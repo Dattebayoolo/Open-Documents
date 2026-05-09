@@ -68,7 +68,7 @@ export default function Layout({ children }: LayoutProps) {
             <button className="icon-btn" onClick={toggleTheme} title="Toggle theme">
               {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
             </button>
-            <button className="btn btn-ghost" style={{ gap: 6, fontSize: 13 }} onClick={() => addToast('AI features coming in Phase 6!')}>
+            <button className="btn btn-ghost" style={{ gap: 6, fontSize: 13 }} onClick={() => useAppStore.getState().setAiPanelOpen(true)}>
               <Sparkles size={15} /> AI
             </button>
           </div>
