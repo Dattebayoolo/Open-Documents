@@ -24,6 +24,7 @@ import AutoSavePlugin from './Plugins/AutoSavePlugin';
 import FindReplacePlugin from './Plugins/FindReplacePlugin';
 import OutlinePlugin from './Plugins/OutlinePlugin';
 import WordCountPlugin from './Plugins/WordCountPlugin';
+import CollabPluginWrapper from './Plugins/CollabPlugin';
 import CommentSidebar, { type Comment } from '../Comments/CommentSidebar';
 import AIPanel from '../AI/AIPanel';
 import AIPromptBar from '../AI/AIPromptBar';
@@ -32,7 +33,7 @@ import useAppStore from '../../store/useAppStore';
 interface EditorProps { docId: string; initialState?: string; }
 
 export default function Editor({ docId, initialState }: EditorProps) {
-  const { aiPanelOpen, commentSidebarOpen } = useAppStore();
+  const { aiPanelOpen, commentSidebarOpen, isCollabMode } = useAppStore();
   const [comments, setComments] = useState<Comment[]>([]);
   const [docContext, setDocContext] = useState('');
   const [selection, setSelection] = useState<{ text: string; x: number; y: number } | null>(null);
@@ -63,13 +64,13 @@ export default function Editor({ docId, initialState }: EditorProps) {
     namespace: 'OpenDocuments',
     theme: EditorTheme,
     nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, CodeNode, CodeHighlightNode],
-    editorState: initialState || null,
+    editorState: isCollabMode ? null : (initialState || null),
     onError: (err: Error) => console.error(err),
   };
 
   return (
     <div className="editor-page">
-      <LexicalComposer initialConfig={initialConfig} key={docId}>
+      <LexicalComposer initialConfig={initialConfig} key={`${docId}-${isCollabMode}`}>
         <MenuBar docId={docId} />
         <ToolbarPlugin onAIClick={() => useAppStore.getState().setAiPanelOpen(true)} />
 
@@ -100,7 +101,10 @@ export default function Editor({ docId, initialState }: EditorProps) {
           {commentSidebarOpen && <CommentSidebar comments={comments} setComments={setComments} />}
         </div>
 
-        <HistoryPlugin />
+        {/* Only render local HistoryPlugin if not in collab mode */}
+        {!isCollabMode && <HistoryPlugin />}
+        {isCollabMode && <CollabPluginWrapper docId={docId} />}
+
         <AutoFocusPlugin />
         <ListPlugin />
         <CheckListPlugin />
@@ -128,7 +132,7 @@ export default function Editor({ docId, initialState }: EditorProps) {
 }
 
 function MenuBar({ docId: _docId }: { docId: string }) {
-  const { addToast, setFindOpen, setOutlineOpen, setWordCountOpen, setCommentSidebarOpen, commentSidebarOpen, setAiPanelOpen, aiPanelOpen } = useAppStore();
+  const { addToast, setFindOpen, setOutlineOpen, setWordCountOpen, setCommentSidebarOpen, commentSidebarOpen, setAiPanelOpen, aiPanelOpen, isCollabMode, setIsCollabMode } = useAppStore();
   const [open, setOpen] = React.useState<string | null>(null);
 
   const menus = [
@@ -176,7 +180,7 @@ function MenuBar({ docId: _docId }: { docId: string }) {
     ]},
     { label: 'Help', items: [
       { label: 'Keyboard Shortcuts', action: () => addToast('⌘B Bold · ⌘I Italic · ⌘U Underline · ⌘F Find · ⌘⇧A AI') },
-      { label: 'About Open Documents', action: () => addToast('Open Documents — Phase 6 ✦ AI Integration complete') },
+      { label: 'About Open Documents', action: () => addToast('Open Documents — Phase 7 ✦ Collaboration active') },
     ]},
   ];
 
@@ -203,6 +207,19 @@ function MenuBar({ docId: _docId }: { docId: string }) {
             )}
           </div>
         ))}
+
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button 
+            className="btn btn-outline" 
+            style={{ height: 26, fontSize: 11, padding: '0 10px', borderColor: isCollabMode ? 'var(--accent)' : 'var(--border)', color: isCollabMode ? 'var(--accent)' : 'var(--text-secondary)' }}
+            onClick={() => {
+              if (!isCollabMode) addToast('Connecting to collaboration server...');
+              setIsCollabMode(!isCollabMode);
+            }}
+          >
+            {isCollabMode ? 'Stop Sharing' : 'Share (Collab Mode)'}
+          </button>
+        </div>
       </div>
     </>
   );

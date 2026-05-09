@@ -25,6 +25,8 @@ interface AppState {
   setWordCountOpen: (open: boolean) => void;
   commentSidebarOpen: boolean;
   setCommentSidebarOpen: (open: boolean) => void;
+  isCollabMode: boolean;
+  setIsCollabMode: (collab: boolean) => void;
   saveStatus: SaveStatus;
   setSaveStatus: (s: SaveStatus) => void;
   toasts: { id: string; msg: string }[];
@@ -57,6 +59,8 @@ const useAppStore = create<AppState>((set, get) => ({
   setWordCountOpen: (open) => set({ wordCountOpen: open }),
   commentSidebarOpen: false,
   setCommentSidebarOpen: (open) => set({ commentSidebarOpen: open }),
+  isCollabMode: false,
+  setIsCollabMode: (c) => set({ isCollabMode: c }),
   saveStatus: 'idle',
   setSaveStatus: (s) => set({ saveStatus: s }),
   toasts: [],
