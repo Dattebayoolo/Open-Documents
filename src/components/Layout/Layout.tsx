@@ -8,7 +8,7 @@ import db from '../../db/db';
 interface LayoutProps { children: React.ReactNode; }
 
 export default function Layout({ children }: LayoutProps) {
-  const { theme, toggleTheme, sidebarOpen, setSidebarOpen, activeDocumentId, setActiveDocument, addToast, toasts, setCmdOpen } = useAppStore();
+  const { theme, toggleTheme, sidebarOpen, setSidebarOpen, activeDocumentId, setActiveDocument, toasts, setCmdOpen } = useAppStore();
 
   const activeDoc = useLiveQuery(
     () => activeDocumentId ? db.documents.get(activeDocumentId) : Promise.resolve(undefined),

@@ -1,73 +1,70 @@
-# React + TypeScript + Vite
+# Open Documents
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Open Documents is a free, open-source Google Docs alternative built with modern web technologies. It features a strict monochromatic black-and-white UI, rich text editing, AI writing assistance, and an offline-first architecture.
 
-Currently, two official plugins are available:
+![Open Documents UI](https://via.placeholder.com/1200x630/000000/FFFFFF?text=Open+Documents)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Features
 
-## React Compiler
+*   **Offline-First & Fast:** Data is persisted locally using IndexedDB (Dexie.js). You can create, edit, and manage documents without an internet connection.
+*   **Rich Text Editing:** Powered by Lexical, the editor supports headings, bold, italic, code blocks, checklists, text alignment, and markdown shortcuts.
+*   **AI Writing Assistant:** Built-in AI panel and floating prompt bar to help you summarize, improve, expand, or rewrite text. (Supports real OpenAI API keys or a simulated fallback).
+*   **Document Management:** Organize documents with folders, star important files, and manage your trash.
+*   **Templates:** Start quickly with built-in templates for résumés, letters, meeting notes, proposals, and essays.
+*   **Monochromatic Design:** A distraction-free, professional black-and-white UI with support for both Light and Dark modes.
+*   **Advanced Tools:** Find & Replace, Document Outline generation, and real-time Word/Character counts.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Tech Stack
 
-## Expanding the ESLint configuration
+*   **Frontend Framework:** React 18 & Vite
+*   **Language:** TypeScript
+*   **Editor Engine:** Lexical (by Meta)
+*   **State Management:** Zustand
+*   **Local Database:** Dexie.js (IndexedDB)
+*   **Icons:** Lucide React
+*   **Styling:** Pure CSS (CSS Variables for theming)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📦 Running Locally
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/open-documents.git
+    cd open-documents
+    ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4.  **Open in your browser:**
+    Navigate to `http://localhost:5173` (or the port specified in your terminal).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🤖 Configuring AI (Optional)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+By default, the AI features use a simulated fallback for demonstration purposes. To use real AI:
+
+1. Open the app and click the **AI** button or open the AI sidebar (`⌘⇧A`).
+2. Click the **Settings (gear)** icon in the AI panel.
+3. Enter your OpenAI API key and click **Save**.
+
+## 🗺️ Roadmap
+
+- [x] Phase 1: Foundation & Design System
+- [x] Phase 2: Dashboard & Document Management
+- [x] Phase 3: Core Editor Engine
+- [x] Phase 4: Data Persistence & Auto-Save
+- [x] Phase 5: Advanced Editor Features (Find/Replace, Outline, Word Count, Comments)
+- [x] Phase 6: AI Integration (Chat Panel & Floating Bar)
+- [ ] Phase 7: Real-Time Collaboration (Yjs & WebSockets)
+- [ ] Phase 8: Export, Import & Search (PDF, DOCX, Markdown)
+- [ ] Phase 9: Polish & Production Deployment
+
+## 📜 License
+
+MIT License. See `LICENSE` for more information.
