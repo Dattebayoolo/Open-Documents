@@ -27,6 +27,8 @@ interface AppState {
   setCommentSidebarOpen: (open: boolean) => void;
   isCollabMode: boolean;
   setIsCollabMode: (collab: boolean) => void;
+  settingsOpen: boolean;
+  setSettingsOpen: (open: boolean) => void;
   saveStatus: SaveStatus;
   setSaveStatus: (s: SaveStatus) => void;
   toasts: { id: string; msg: string }[];
@@ -61,6 +63,8 @@ const useAppStore = create<AppState>((set, get) => ({
   setCommentSidebarOpen: (open) => set({ commentSidebarOpen: open }),
   isCollabMode: false,
   setIsCollabMode: (c) => set({ isCollabMode: c }),
+  settingsOpen: false,
+  setSettingsOpen: (open) => set({ settingsOpen: open }),
   saveStatus: 'idle',
   setSaveStatus: (s) => set({ saveStatus: s }),
   toasts: [],

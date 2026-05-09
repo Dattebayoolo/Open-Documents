@@ -50,7 +50,13 @@ export default function FindReplacePlugin() {
     if (!find) return;
     editor.update(() => {
       const root = $getRoot();
-      const descendants = root.getAllTextNodes ? (root as any).getAllTextNodes() : [];
+      const descendants: TextNode[] = [];
+      const collectTextNodes = (node: any) => {
+        if ($isTextNode(node)) descendants.push(node as TextNode);
+        const children = node.getChildren?.();
+        if (children) children.forEach(collectTextNodes);
+      };
+      collectTextNodes(root);
       const flags = matchCase ? 'g' : 'gi';
       const re = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), flags);
       descendants.forEach((node: TextNode) => {

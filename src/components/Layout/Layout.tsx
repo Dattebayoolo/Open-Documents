@@ -1,21 +1,15 @@
 import React, { useEffect } from 'react';
 import { Moon, Sun, Menu, PanelLeftClose, Sparkles, ChevronLeft } from 'lucide-react';
-import { useLiveQuery } from 'dexie-react-hooks';
 import useAppStore from '../../store/useAppStore';
 import Sidebar from './Sidebar';
 import db from '../../db/db';
 
-interface LayoutProps { children: React.ReactNode; }
+interface LayoutProps { children: React.ReactNode; title?: string; }
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children, title }: LayoutProps) {
   const { theme, toggleTheme, sidebarOpen, setSidebarOpen, activeDocumentId, setActiveDocument, toasts, setCmdOpen } = useAppStore();
 
-  const activeDoc = useLiveQuery(
-    () => activeDocumentId ? db.documents.get(activeDocumentId) : Promise.resolve(undefined),
-    [activeDocumentId]
-  );
-
-  // Apply theme
+  // Apply theme — only if it differs from what App.tsx already set
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -53,9 +47,8 @@ export default function Layout({ children }: LayoutProps) {
               </button>
               <input
                 className="header-title-input"
-                value={activeDoc?.title ?? ''}
-                onChange={e => renameDoc(e.target.value)}
-                onBlur={e => { if (!e.target.value.trim()) renameDoc('Untitled document'); }}
+                defaultValue={title || 'Untitled document'}
+                onBlur={e => { const val = e.target.value.trim(); renameDoc(val || 'Untitled document'); }}
                 placeholder="Untitled document"
               />
             </>

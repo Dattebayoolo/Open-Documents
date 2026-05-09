@@ -17,12 +17,16 @@ export default function AIPanel({ docContext, onInsert }: AIPanelProps) {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+
   const send = async (prompt?: string) => {
     const text = (prompt ?? input).trim();
     if (!text || streaming) return;
     setInput('');
 
     const userMsg: ChatMessage = { role: 'user', content: text };
+    const currentMessages = messagesRef.current;
     setMessages(prev => [...prev, userMsg]);
     setStreaming(true);
     abortRef.current = false;
@@ -31,7 +35,7 @@ export default function AIPanel({ docContext, onInsert }: AIPanelProps) {
     setMessages(prev => [...prev, assistantMsg]);
 
     try {
-      const gen = streamCompletion(text, docContext, messages);
+      const gen = streamCompletion(text, docContext, currentMessages);
       for await (const token of gen) {
         if (abortRef.current) break;
         setMessages(prev => {
@@ -40,7 +44,7 @@ export default function AIPanel({ docContext, onInsert }: AIPanelProps) {
           return updated;
         });
       }
-    } catch (e) {
+    } catch {
       setMessages(prev => {
         const updated = [...prev];
         updated[updated.length - 1] = { role: 'assistant', content: 'Something went wrong. Please try again.' };
@@ -147,8 +151,8 @@ export default function AIPanel({ docContext, onInsert }: AIPanelProps) {
             }}>
               {msg.content || (streaming && i === messages.length - 1
                 ? <span style={{ display: 'inline-flex', gap: 3 }}>
-                    {[0, 1, 2].map(j => <span key={j} style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--text-muted)', animation: `pulse 1.2s ${j * 0.2}s infinite` }} />)}
-                  </span>
+                  {[0, 1, 2].map(j => <span key={j} style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--text-muted)', animation: `pulse 1.2s ${j * 0.2}s infinite` }} />)}
+                </span>
                 : ''
               )}
             </div>
@@ -181,8 +185,8 @@ export default function AIPanel({ docContext, onInsert }: AIPanelProps) {
           {streaming
             ? <button className="btn btn-outline" style={{ height: 36, padding: '0 10px', fontSize: 12, flexShrink: 0 }} onClick={stop}>Stop</button>
             : <button className="btn btn-primary" style={{ height: 36, width: 36, padding: 0, flexShrink: 0 }} onClick={() => send()} disabled={!input.trim()}>
-                <Send size={14} />
-              </button>
+              <Send size={14} />
+            </button>
           }
         </div>
         <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 5, textAlign: 'center' }}>

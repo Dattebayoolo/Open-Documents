@@ -12,14 +12,9 @@
 [![React](https://img.shields.io/badge/React-19-000000?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-000000?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-8-000000?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Lexical](https://img.shields.io/badge/Lexical-Editor-000000?style=for-the-badge)](https://lexical.dev/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-000000.svg?style=for-the-badge)](https://github.com/Dattebayoolo/Open-Documents/pulls)
 
-[**Live Demo**](#) · [**Documentation**](#-documentation) · [**Report Bug**](https://github.com/Dattebayoolo/Open-Documents/issues) · [**Request Feature**](https://github.com/Dattebayoolo/Open-Documents/issues)
-
 <br />
-
-<img src="https://via.placeholder.com/1200x630/000000/FFFFFF?text=Open+Documents" alt="Open Documents Preview" width="100%" />
 
 </div>
 
@@ -53,7 +48,7 @@
   <tr>
     <td width="33%" valign="top">
       <h3>📝 Rich Editing</h3>
-      Lexical-powered editor with headings, lists, tables, code blocks, checklists, markdown shortcuts, find &amp; replace, and a live document outline.
+      Lexical-powered editor with headings, lists, tables, code blocks, checklists, markdown shortcuts, find & replace, and a live document outline.
     </td>
     <td width="33%" valign="top">
       <h3>🎨 Monochromatic UI</h3>
@@ -71,35 +66,35 @@
 ## 🚀 Features
 
 ### Editor
-- ✅ Rich text formatting — **bold**, *italic*, underline, strikethrough, code
-- ✅ Headings (H1–H6), paragraphs, blockquotes, horizontal rules
-- ✅ Bullet, numbered, and check lists with nesting
-- ✅ Code blocks with syntax highlighting
-- ✅ Text alignment (left, center, right, justify)
-- ✅ Markdown shortcuts (`#`, `**`, `` ` `` etc.)
-- ✅ Find & Replace (`⌘F` / `⌘H`)
-- ✅ Document outline auto-generated from headings
-- ✅ Live word count, character count & reading time
+- Rich text formatting — **bold**, *italic*, underline, strikethrough, code
+- Headings (H1–H6), paragraphs, blockquotes, horizontal rules
+- Bullet, numbered, and check lists with nesting
+- Code blocks with syntax highlighting
+- Text alignment (left, center, right, justify)
+- Markdown shortcuts (`#`, `**`, `` ` `` etc.)
+- Find & Replace (`⌘F` / `⌘H`)
+- Document outline auto-generated from headings
+- Live word count, character count & reading time
 
 ### Workspace
-- ✅ Document dashboard with grid & list views
-- ✅ Folders with drag-and-drop organization
-- ✅ Starred documents and trash with restore
-- ✅ Built-in templates (Résumé, Letter, Meeting Notes, Proposal, Essay)
-- ✅ Command palette for blazing-fast navigation
-- ✅ Light & dark mode toggle
+- Document dashboard with grid & list views
+- Folders with drag-and-drop organization
+- Starred documents and trash with restore
+- Built-in templates (Résumé, Letter, Meeting Notes, Proposal, Essay)
+- Command palette for blazing-fast navigation
+- Light & dark mode toggle
 
 ### AI Assistant
-- ✅ AI side panel for chat-style interaction
-- ✅ Floating "Ask AI" prompt bar over selected text
-- ✅ Quick actions: Summarize · Improve · Expand · Rewrite
-- ✅ Bring-your-own OpenAI API key
-- ✅ Graceful simulated fallback for demos
+- AI side panel for chat-style interaction
+- Floating "Ask AI" prompt bar over selected text
+- Quick actions: Summarize · Improve · Expand · Rewrite
+- Bring-your-own OpenAI API key
+- Graceful simulated fallback for demos
 
-### Collaboration *(in progress)*
-- 🔄 Yjs CRDT-based shared editing
-- 🔄 WebSocket sync server (`server.js`)
-- 🔄 Live presence and cursor labels
+### Collaboration
+- Yjs CRDT-based shared editing
+- WebSocket sync server
+- Live presence and cursor labels
 
 ---
 
@@ -112,24 +107,12 @@
 | **Editor Engine**  | [Lexical](https://lexical.dev/) by Meta                                    |
 | **State**          | [Zustand](https://zustand-demo.pmnd.rs/)                                   |
 | **Local DB**       | [Dexie.js](https://dexie.org/) (IndexedDB)                                 |
-| **Realtime**       | [Yjs](https://yjs.dev/) + [y-websocket](https://github.com/yjs/y-websocket) / [Hocuspocus](https://tiptap.dev/hocuspocus) |
+| **Realtime**       | [Yjs](https://yjs.dev/) + [Hocuspocus](https://tiptap.dev/hocuspocus)      |
 | **Routing**        | [React Router v7](https://reactrouter.com/)                                |
 | **Drag & Drop**    | [@dnd-kit](https://dndkit.com/)                                            |
 | **Icons**          | [Lucide](https://lucide.dev/)                                              |
 | **Styling**        | Pure CSS with CSS Variables for theming                                    |
 | **Server**         | Node.js + `ws` WebSocket sync server                                       |
-
----
-
-## 📸 Screenshots
-
-<div align="center">
-
-| Dashboard | Editor | AI Panel |
-| :---: | :---: | :---: |
-| <img src="https://via.placeholder.com/400x250/ffffff/000000?text=Dashboard" alt="Dashboard" /> | <img src="https://via.placeholder.com/400x250/ffffff/000000?text=Editor" alt="Editor" /> | <img src="https://via.placeholder.com/400x250/000000/ffffff?text=AI+Panel" alt="AI Panel" /> |
-
-</div>
 
 ---
 
@@ -173,8 +156,6 @@ For real-time collaboration, start the bundled WebSocket server:
 node server.js
 ```
 
-Then connect the editor to it — see `src/services/collab.ts` for configuration.
-
 ---
 
 ## 🤖 Configuring AI
@@ -206,45 +187,6 @@ By default, AI features run in **simulated mode** so you can explore them with n
 
 ---
 
-## 🗂️ Project Structure
-
-```
-open-documents/
-├── public/                 # Static assets (icons, favicon)
-├── server.js               # Yjs WebSocket collaboration server
-├── src/
-│   ├── components/
-│   │   ├── AI/             # AI panel & floating prompt bar
-│   │   ├── Editor/         # Lexical editor, plugins & nodes
-│   │   ├── Layout/         # App shell, sidebar, command palette
-│   │   └── ...
-│   ├── db/                 # Dexie schema (IndexedDB)
-│   ├── services/           # AI, collab, export, sync services
-│   ├── store/              # Zustand stores
-│   ├── App.tsx
-│   └── main.tsx
-├── plan.md                 # Comprehensive product & technical plan
-└── package.json
-```
-
----
-
-## 🗺️ Roadmap
-
-- [x] **Phase 1** — Foundation & Design System
-- [x] **Phase 2** — Dashboard & Document Management
-- [x] **Phase 3** — Core Editor Engine
-- [x] **Phase 4** — Data Persistence & Auto-Save
-- [x] **Phase 5** — Advanced Editor Features (Find/Replace, Outline, Word Count)
-- [x] **Phase 6** — AI Integration (Chat Panel & Floating Bar)
-- [ ] **Phase 7** — Real-Time Collaboration (Yjs & WebSockets)
-- [ ] **Phase 8** — Export, Import & Search (PDF, DOCX, Markdown)
-- [ ] **Phase 9** — Polish & Production Deployment
-
-See [`plan.md`](./plan.md) for the full technical roadmap.
-
----
-
 ## 🤝 Contributing
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. **Any contributions you make are greatly appreciated.**
@@ -255,27 +197,13 @@ Contributions are what make the open-source community such an amazing place to l
 4. Push to the branch (`git push origin feat/amazing-feature`)
 5. Open a **Pull Request**
 
-Please ensure your PR:
-- Passes `npm run lint` and `npm run build`
-- Includes a clear description of the change
-- References any related issue (e.g. `Closes #42`)
-
 > Don't forget to give the project a ⭐ — it really helps!
-
----
-
-## 📚 Documentation
-
-- [`plan.md`](./plan.md) — Full architecture, data schemas, and phased roadmap
-- [Lexical Docs](https://lexical.dev/docs/intro) — Editor framework
-- [Yjs Docs](https://docs.yjs.dev/) — CRDT-based collaboration
-- [Dexie Docs](https://dexie.org/docs/) — IndexedDB wrapper
 
 ---
 
 ## 📜 License
 
-Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for more information.
+Distributed under the **MIT License**.
 
 ---
 

@@ -5,7 +5,7 @@ import db from '../../db/db';
 import useAppStore from '../../store/useAppStore';
 
 export default function Sidebar() {
-  const { setActiveDocument, addToast } = useAppStore();
+  const { setActiveDocument, addToast, setSettingsOpen } = useAppStore();
   const [expandFolders, setExpandFolders] = useState(true);
   const [activeSection, setActiveSection] = useState<'all' | 'starred' | 'trash'>('all');
 
@@ -98,7 +98,7 @@ export default function Sidebar() {
 
       <div className="divider" />
       <div className="sidebar-section" style={{ paddingBottom: 12 }}>
-        <div className="sidebar-item">
+        <div className="sidebar-item" onClick={() => setSettingsOpen(true)}>
           <Settings size={15} /> Settings
         </div>
       </div>

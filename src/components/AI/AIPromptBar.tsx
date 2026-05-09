@@ -27,6 +27,8 @@ export default function AIPromptBar({ selectedText, onReplace, onDismiss, positi
         acc += token;
         setResult(acc);
       }
+    } catch {
+      setResult('Sorry, something went wrong. Please try again.');
     } finally {
       setStreaming(false);
     }

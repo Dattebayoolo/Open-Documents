@@ -10,9 +10,11 @@ export default function AutoSavePlugin({ docId }: AutoSavePluginProps) {
   const [editor] = useLexicalComposerContext();
   const { setSaveStatus } = useAppStore();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const docIdRef = useRef(docId);
+  docIdRef.current = docId;
 
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
+    const unregister = editor.registerUpdateListener(({ editorState }) => {
       if (timer.current) clearTimeout(timer.current);
       setSaveStatus('saving');
       timer.current = setTimeout(async () => {
@@ -20,13 +22,16 @@ export default function AutoSavePlugin({ docId }: AutoSavePluginProps) {
           const state = JSON.stringify(editorState.toJSON());
           let wordCount = 0;
           let charCount = 0;
+          let plainText = '';
           editorState.read(() => {
             const text = $getRoot().getTextContent();
+            plainText = text;
             charCount = text.length;
             wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
           });
-          await db.documents.update(docId, {
+          await db.documents.update(docIdRef.current, {
             lexicalState: state,
+            plainText,
             wordCount,
             charCount,
             readingTimeMin: Math.ceil(wordCount / 200),
@@ -38,7 +43,12 @@ export default function AutoSavePlugin({ docId }: AutoSavePluginProps) {
         }
       }, 1500);
     });
-  }, [editor, docId, setSaveStatus]);
+
+    return () => {
+      unregister();
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [editor, setSaveStatus]);
 
   return null;
 }

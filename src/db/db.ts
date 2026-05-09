@@ -4,6 +4,7 @@ export interface OpenDocument {
   id: string;
   title: string;
   lexicalState: string;
+  plainText?: string;
   folderId: string | null;
   tags: string[];
   isPinned: boolean;

@@ -32,7 +32,7 @@ async function* simulateStream(prompt: string, delayMs = 28): AsyncGenerator<str
 }
 
 // Real OpenAI streaming
-async function* openAIStream(messages: { role: string; content: string }[]): AsyncGenerator<string> {
+async function* openAIStream(messages: { role: 'system' | 'user' | 'assistant'; content: string }[]): AsyncGenerator<string> {
   const apiKey = getApiKey();
   if (!apiKey) { yield* simulateStream(messages[messages.length - 1]?.content || ''); return; }
 
@@ -75,9 +75,9 @@ export async function* streamCompletion(
 Help users write, edit, improve, and analyze their documents. Be concise and helpful.
 ${context ? `\nDocument context:\n"""\n${context.slice(0, 1200)}\n"""` : ''}`;
 
-  const messages = [
+  const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
     { role: 'system', content: systemPrompt },
-    ...history.map(m => ({ role: m.role, content: m.content })),
+    ...history.map(m => ({ role: m.role as 'system' | 'user' | 'assistant', content: m.content })),
     { role: 'user', content: userPrompt },
   ];
 

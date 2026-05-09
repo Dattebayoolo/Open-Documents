@@ -4,6 +4,11 @@ import { providerFactory, getRandomColor, getRandomName } from '../../../service
 import { Users } from 'lucide-react';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 
+interface AwarenessUser {
+  name: string;
+  color: string;
+}
+
 interface CollabProps {
   docId: string;
 }
@@ -12,18 +17,19 @@ export default function CollabPluginWrapper({ docId }: CollabProps) {
   const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
   const color = useMemo(() => getRandomColor(), []);
   const name = useMemo(() => getRandomName(), []);
-  const [activeUsers, setActiveUsers] = useState<any[]>([]);
+  const [activeUsers, setActiveUsers] = useState<AwarenessUser[]>([]);
 
   // The cursor rendering is handled automatically by LexicalCollaborationPlugin
   // We just need to render the presence avatars
 
   useEffect(() => {
-    if (!provider) return;
-    
+    if (!provider || !provider.awareness) return;
+
     // Connect to websocket when mounted
     provider.connect();
-    
+
     const updateAwareness = () => {
+      if (!provider.awareness) return;
       // Hocuspocus maps awareness states to provider.awareness
       const states = Array.from(provider.awareness.getStates().values());
       const users = states.map((state: any) => state.user).filter(Boolean);
@@ -31,12 +37,14 @@ export default function CollabPluginWrapper({ docId }: CollabProps) {
     };
 
     provider.awareness.on('change', updateAwareness);
-    
+
     // Set our own presence
     provider.awareness.setLocalStateField('user', { name, color });
 
     return () => {
-      provider.awareness.off('change', updateAwareness);
+      if (provider.awareness) {
+        provider.awareness.off('change', updateAwareness);
+      }
       provider.destroy();
     };
   }, [provider, name, color]);

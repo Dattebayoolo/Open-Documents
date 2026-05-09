@@ -21,9 +21,13 @@ export default function Dashboard() {
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
 
   const docs = useLiveQuery(async () => {
-    let q = db.documents.where('isTrashed').equals(0);
-    const all = await q.toArray();
-    const filtered = search ? all.filter(d => d.title.toLowerCase().includes(search.toLowerCase())) : all;
+    let query = db.documents.where('isTrashed').equals(0);
+    const all = await query.toArray();
+    const term = search.toLowerCase();
+    const filtered = search ? all.filter(d => 
+      d.title.toLowerCase().includes(term) || 
+      (d.plainText && d.plainText.toLowerCase().includes(term))
+    ) : all;
     return filtered.sort((a, b) => sort === 'title' ? a.title.localeCompare(b.title) : (b[sort] as number) - (a[sort] as number));
   }, [search, sort]);
 

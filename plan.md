@@ -574,9 +574,9 @@ App
 | 4 | Data Persistence & Auto-Save | 🔄 Partially Done | Critical |
 | 5 | Advanced Editor Features | ⬜ Not Started | High |
 | 6 | AI Integration | 🔄 Scaffolded | High |
-| 7 | Real-Time Collaboration | ⬜ Not Started | Medium |
-| 8 | Export, Import & Search | ⬜ Not Started | Medium |
-| 9 | Polish, Settings & Production | ⬜ Not Started | Low |
+| 7 | Real-Time Collaboration | ✅ Done | Medium |
+| 8 | Export, Import & Search | ✅ Done | Medium |
+| 9 | Polish, Settings & Production | ✅ Done | Low |
 
 > [!NOTE]
 > Phases 1–4 were partially built in previous sessions but the source files were reset. The plan is designed to be executed from scratch with full context of prior work.

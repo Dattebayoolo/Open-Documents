@@ -26,6 +26,8 @@ import OutlinePlugin from './Plugins/OutlinePlugin';
 import WordCountPlugin from './Plugins/WordCountPlugin';
 import CollabPluginWrapper from './Plugins/CollabPlugin';
 import CommentSidebar, { type Comment } from '../Comments/CommentSidebar';
+import { exportToPlainText, exportToMarkdown, exportToPDF } from '../../services/export';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import AIPanel from '../AI/AIPanel';
 import AIPromptBar from '../AI/AIPromptBar';
 import useAppStore from '../../store/useAppStore';
@@ -74,12 +76,11 @@ export default function Editor({ docId, initialState }: EditorProps) {
         <MenuBar docId={docId} />
         <ToolbarPlugin onAIClick={() => useAppStore.getState().setAiPanelOpen(true)} />
 
-        {/* Editor body + sidebars */}
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           <div className="editor-body" style={{ flex: 1, position: 'relative' }}>
             <div style={{ position: 'relative' }}>
               <RichTextPlugin
-                contentEditable={<ContentEditable className="editor-paper" spellCheck />}
+                contentEditable={<ContentEditable className="editor-paper" style={{ fontFamily: localStorage.getItem('default_font') || 'Merriweather' }} spellCheck />}
                 placeholder={<div className="editor-placeholder" style={{ top: 96, left: 96 }}>Start typing…</div>}
                 ErrorBoundary={LexicalErrorBoundary}
               />
@@ -91,7 +92,6 @@ export default function Editor({ docId, initialState }: EditorProps) {
             <AIPanel
               docContext={docContext}
               onInsert={(text) => {
-                // Insert text at cursor — basic implementation
                 document.execCommand('insertText', false, text);
               }}
             />
@@ -134,54 +134,69 @@ export default function Editor({ docId, initialState }: EditorProps) {
 function MenuBar({ docId: _docId }: { docId: string }) {
   const { addToast, setFindOpen, setOutlineOpen, setWordCountOpen, setCommentSidebarOpen, commentSidebarOpen, setAiPanelOpen, aiPanelOpen, isCollabMode, setIsCollabMode } = useAppStore();
   const [open, setOpen] = React.useState<string | null>(null);
+  const [editor] = useLexicalComposerContext();
 
   const menus = [
-    { label: 'File', items: [
-      { label: 'New Document', shortcut: '⌘N', action: () => addToast('Use sidebar "New Document"') },
-      { label: 'separator' },
-      { label: 'Download as PDF', action: () => addToast('PDF export — Phase 8') },
-      { label: 'Download as Markdown', action: () => addToast('Markdown export — Phase 8') },
-      { label: 'Download as Plain Text', action: () => addToast('Text export — Phase 8') },
-    ]},
-    { label: 'Edit', items: [
-      { label: 'Undo', shortcut: '⌘Z', action: () => document.execCommand('undo') },
-      { label: 'Redo', shortcut: '⌘⇧Z', action: () => document.execCommand('redo') },
-      { label: 'separator' },
-      { label: 'Find', shortcut: '⌘F', action: () => setFindOpen(true) },
-      { label: 'Find & Replace', shortcut: '⌘H', action: () => setFindOpen(true) },
-      { label: 'separator' },
-      { label: 'Select All', shortcut: '⌘A', action: () => document.execCommand('selectAll') },
-    ]},
-    { label: 'View', items: [
-      { label: 'Document Outline', action: () => setOutlineOpen(true) },
-      { label: 'Word Count', action: () => setWordCountOpen(true) },
-      { label: `${commentSidebarOpen ? 'Hide' : 'Show'} Comments`, action: () => setCommentSidebarOpen(!commentSidebarOpen) },
-      { label: `${aiPanelOpen ? 'Hide' : 'Show'} AI Panel`, action: () => setAiPanelOpen(!aiPanelOpen) },
-    ]},
-    { label: 'Insert', items: [
-      { label: 'Comment', shortcut: '⌘⌥M', action: () => setCommentSidebarOpen(true) },
-      { label: 'Link', shortcut: '⌘K', action: () => addToast('Select text then use toolbar link button') },
-      { label: 'Table', action: () => addToast('Table — Phase 5 coming') },
-      { label: 'Image', action: () => addToast('Image upload — Phase 5 coming') },
-    ]},
-    { label: 'Format', items: [
-      { label: 'Bold', shortcut: '⌘B', action: () => document.execCommand('bold') },
-      { label: 'Italic', shortcut: '⌘I', action: () => document.execCommand('italic') },
-      { label: 'Underline', shortcut: '⌘U', action: () => document.execCommand('underline') },
-      { label: 'separator' },
-      { label: 'Clear Formatting', action: () => {} },
-    ]},
-    { label: 'Tools', items: [
-      { label: 'Word Count', action: () => setWordCountOpen(true) },
-      { label: 'Document Outline', action: () => setOutlineOpen(true) },
-      { label: 'Find & Replace', shortcut: '⌘H', action: () => setFindOpen(true) },
-      { label: 'separator' },
-      { label: 'AI Assistant', shortcut: '⌘⇧A', action: () => setAiPanelOpen(true) },
-    ]},
-    { label: 'Help', items: [
-      { label: 'Keyboard Shortcuts', action: () => addToast('⌘B Bold · ⌘I Italic · ⌘U Underline · ⌘F Find · ⌘⇧A AI') },
-      { label: 'About Open Documents', action: () => addToast('Open Documents — Phase 7 ✦ Collaboration active') },
-    ]},
+    {
+      label: 'File', items: [
+        { label: 'New Document', shortcut: '⌘N', action: () => addToast('Use sidebar "New Document"') },
+        { label: 'separator' },
+        { label: 'Download as PDF', action: () => exportToPDF('.editor-paper', 'OpenDocument').catch(() => addToast('Error exporting PDF')) },
+        { label: 'Download as Markdown', action: () => exportToMarkdown(editor, 'OpenDocument') },
+        { label: 'Download as Plain Text', action: () => exportToPlainText(editor, 'OpenDocument') },
+      ]
+    },
+    {
+      label: 'Edit', items: [
+        { label: 'Undo', shortcut: '⌘Z', action: () => document.execCommand('undo') },
+        { label: 'Redo', shortcut: '⌘⇧Z', action: () => document.execCommand('redo') },
+        { label: 'separator' },
+        { label: 'Find', shortcut: '⌘F', action: () => setFindOpen(true) },
+        { label: 'Find & Replace', shortcut: '⌘H', action: () => setFindOpen(true) },
+        { label: 'separator' },
+        { label: 'Select All', shortcut: '⌘A', action: () => document.execCommand('selectAll') },
+      ]
+    },
+    {
+      label: 'View', items: [
+        { label: 'Document Outline', action: () => setOutlineOpen(true) },
+        { label: 'Word Count', action: () => setWordCountOpen(true) },
+        { label: `${commentSidebarOpen ? 'Hide' : 'Show'} Comments`, action: () => setCommentSidebarOpen(!commentSidebarOpen) },
+        { label: `${aiPanelOpen ? 'Hide' : 'Show'} AI Panel`, action: () => setAiPanelOpen(!aiPanelOpen) },
+      ]
+    },
+    {
+      label: 'Insert', items: [
+        { label: 'Comment', shortcut: '⌘⌥M', action: () => setCommentSidebarOpen(true) },
+        { label: 'Link', shortcut: '⌘K', action: () => addToast('Select text then use toolbar link button') },
+        { label: 'Table', action: () => addToast('Table — Phase 5 coming') },
+        { label: 'Image', action: () => addToast('Image upload — Phase 5 coming') },
+      ]
+    },
+    {
+      label: 'Format', items: [
+        { label: 'Bold', shortcut: '⌘B', action: () => document.execCommand('bold') },
+        { label: 'Italic', shortcut: '⌘I', action: () => document.execCommand('italic') },
+        { label: 'Underline', shortcut: '⌘U', action: () => document.execCommand('underline') },
+        { label: 'separator' },
+        { label: 'Clear Formatting', action: () => { } },
+      ]
+    },
+    {
+      label: 'Tools', items: [
+        { label: 'Word Count', action: () => setWordCountOpen(true) },
+        { label: 'Document Outline', action: () => setOutlineOpen(true) },
+        { label: 'Find & Replace', shortcut: '⌘H', action: () => setFindOpen(true) },
+        { label: 'separator' },
+        { label: 'AI Assistant', shortcut: '⌘⇧A', action: () => setAiPanelOpen(true) },
+      ]
+    },
+    {
+      label: 'Help', items: [
+        { label: 'Keyboard Shortcuts', action: () => addToast('⌘B Bold · ⌘I Italic · ⌘U Underline · ⌘F Find · ⌘⇧A AI') },
+        { label: 'About Open Documents', action: () => addToast('Open Documents — Phase 7 ✦ Collaboration active') },
+      ]
+    },
   ];
 
   return (
@@ -199,9 +214,9 @@ function MenuBar({ docId: _docId }: { docId: string }) {
                   item.label === 'separator'
                     ? <div key={i} className="dropdown-sep" />
                     : <div key={i} className="dropdown-item" onClick={() => { item.action?.(); setOpen(null); }}>
-                        {item.label}
-                        {item.shortcut && <span className="dropdown-shortcut">{item.shortcut}</span>}
-                      </div>
+                      {item.label}
+                      {item.shortcut && <span className="dropdown-shortcut">{item.shortcut}</span>}
+                    </div>
                 )}
               </div>
             )}
@@ -209,8 +224,8 @@ function MenuBar({ docId: _docId }: { docId: string }) {
         ))}
 
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button 
-            className="btn btn-outline" 
+          <button
+            className="btn btn-outline"
             style={{ height: 26, fontSize: 11, padding: '0 10px', borderColor: isCollabMode ? 'var(--accent)' : 'var(--border)', color: isCollabMode ? 'var(--accent)' : 'var(--text-secondary)' }}
             onClick={() => {
               if (!isCollabMode) addToast('Connecting to collaboration server...');
