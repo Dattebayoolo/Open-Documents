@@ -8,11 +8,12 @@ import {
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text';
 import { INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, INSERT_CHECK_LIST_COMMAND, $isListNode, ListNode } from '@lexical/list';
 import { $getNearestNodeOfType, mergeRegister } from '@lexical/utils';
-import { $setBlocksType } from '@lexical/selection';
+import { $setBlocksType, $patchStyleText } from '@lexical/selection';
+import { TOGGLE_LINK_COMMAND } from '@lexical/link';
 import {
   Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, AlignJustify,
   Undo, Redo, List, ListOrdered, ListChecks, Indent, Outdent, Sparkles, Link2,
-  Subscript, Superscript, Code, RemoveFormatting, Minus,
+  Subscript, Superscript, Code, RemoveFormatting,
 } from 'lucide-react';
 
 const FONT_FAMILIES = ['Merriweather', 'Inter', 'JetBrains Mono', 'Arial', 'Georgia', 'Times New Roman', 'Courier New'];
@@ -83,21 +84,38 @@ export default function ToolbarPlugin({ onAIClick }: ToolbarProps) {
     setBlockType(label);
   };
 
-  const TBtn = ({ title, active, onClick, children }: { title: string; active?: boolean; onClick: () => void; children: React.ReactNode }) => (
-    <button className={`toolbar-btn ${active ? 'active' : ''}`} title={title} onClick={onClick}>{children}</button>
-  );
+  const handleLinkInsert = () => {
+    const url = prompt('Enter URL:');
+    if (url) {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
+    }
+  };
 
   return (
     <div className="toolbar">
-      <TBtn title="Undo (⌘Z)" onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}><Undo size={14} /></TBtn>
-      <TBtn title="Redo (⌘⇧Z)" onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}><Redo size={14} /></TBtn>
+      <button className="toolbar-btn" title="Undo (⌘Z)" onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}><Undo size={14} /></button>
+      <button className="toolbar-btn" title="Redo (⌘⇧Z)" onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}><Redo size={14} /></button>
       <div className="toolbar-divider" />
 
-      <select className="toolbar-select" style={{ width: 128 }} value={fontFamily} onChange={e => setFontFamily(e.target.value)} title="Font family">
+      <select className="toolbar-select" style={{ width: 128 }} value={fontFamily} onChange={e => {
+        const val = e.target.value;
+        setFontFamily(val);
+        editor.update(() => {
+          const sel = $getSelection();
+          if ($isRangeSelection(sel)) $patchStyleText(sel, { 'font-family': val });
+        });
+      }} title="Font family">
         {FONT_FAMILIES.map(f => <option key={f}>{f}</option>)}
       </select>
 
-      <select className="toolbar-select" style={{ width: 52 }} value={fontSize} onChange={e => setFontSize(e.target.value)} title="Font size">
+      <select className="toolbar-select" style={{ width: 52 }} value={fontSize} onChange={e => {
+        const val = e.target.value;
+        setFontSize(val);
+        editor.update(() => {
+          const sel = $getSelection();
+          if ($isRangeSelection(sel)) $patchStyleText(sel, { 'font-size': val + 'px' });
+        });
+      }} title="Font size">
         {FONT_SIZES.map(s => <option key={s}>{s}</option>)}
       </select>
 
@@ -109,33 +127,50 @@ export default function ToolbarPlugin({ onAIClick }: ToolbarProps) {
 
       <div className="toolbar-divider" />
 
-      <TBtn title="Bold (⌘B)" active={isBold} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}><Bold size={14} /></TBtn>
-      <TBtn title="Italic (⌘I)" active={isItalic} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}><Italic size={14} /></TBtn>
-      <TBtn title="Underline (⌘U)" active={isUnderline} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}><Underline size={14} /></TBtn>
-      <TBtn title="Strikethrough" active={isStrike} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}><Strikethrough size={14} /></TBtn>
-      <TBtn title="Inline Code" active={isCode} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}><Code size={14} /></TBtn>
-      <TBtn title="Subscript" active={isSub} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'subscript')}><Subscript size={14} /></TBtn>
-      <TBtn title="Superscript" active={isSup} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript')}><Superscript size={14} /></TBtn>
+      <button className={`toolbar-btn ${isBold ? 'active' : ''}`} title="Bold (⌘B)" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}><Bold size={14} /></button>
+      <button className={`toolbar-btn ${isItalic ? 'active' : ''}`} title="Italic (⌘I)" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}><Italic size={14} /></button>
+      <button className={`toolbar-btn ${isUnderline ? 'active' : ''}`} title="Underline (⌘U)" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}><Underline size={14} /></button>
+      <button className={`toolbar-btn ${isStrike ? 'active' : ''}`} title="Strikethrough" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}><Strikethrough size={14} /></button>
+      <button className={`toolbar-btn ${isCode ? 'active' : ''}`} title="Inline Code" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}><Code size={14} /></button>
+      <button className={`toolbar-btn ${isSub ? 'active' : ''}`} title="Subscript" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'subscript')}><Subscript size={14} /></button>
+      <button className={`toolbar-btn ${isSup ? 'active' : ''}`} title="Superscript" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript')}><Superscript size={14} /></button>
 
       <div className="toolbar-divider" />
 
-      <TBtn title="Left" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}><AlignLeft size={14} /></TBtn>
-      <TBtn title="Center" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}><AlignCenter size={14} /></TBtn>
-      <TBtn title="Right" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}><AlignRight size={14} /></TBtn>
-      <TBtn title="Justify" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}><AlignJustify size={14} /></TBtn>
+      <button className="toolbar-btn" title="Align left" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}><AlignLeft size={14} /></button>
+      <button className="toolbar-btn" title="Align center" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}><AlignCenter size={14} /></button>
+      <button className="toolbar-btn" title="Align right" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}><AlignRight size={14} /></button>
+      <button className="toolbar-btn" title="Justify" onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}><AlignJustify size={14} /></button>
 
       <div className="toolbar-divider" />
 
-      <TBtn title="Bullet list" onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)}><List size={14} /></TBtn>
-      <TBtn title="Numbered list" onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)}><ListOrdered size={14} /></TBtn>
-      <TBtn title="Checklist" onClick={() => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)}><ListChecks size={14} /></TBtn>
-      <TBtn title="Indent" onClick={() => editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)}><Indent size={14} /></TBtn>
-      <TBtn title="Outdent" onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}><Outdent size={14} /></TBtn>
+      <button className="toolbar-btn" title="Bullet list" onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)}><List size={14} /></button>
+      <button className="toolbar-btn" title="Numbered list" onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)}><ListOrdered size={14} /></button>
+      <button className="toolbar-btn" title="Checklist" onClick={() => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)}><ListChecks size={14} /></button>
+      <button className="toolbar-btn" title="Indent" onClick={() => editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)}><Indent size={14} /></button>
+      <button className="toolbar-btn" title="Outdent" onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}><Outdent size={14} /></button>
 
       <div className="toolbar-divider" />
-      <TBtn title="Horizontal rule" onClick={() => {}}><Minus size={14} /></TBtn>
-      <TBtn title="Insert link" onClick={() => {}}><Link2 size={14} /></TBtn>
-      <TBtn title="Clear formatting" onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}><RemoveFormatting size={14} /></TBtn>
+      <button className="toolbar-btn" title="Insert link" onClick={handleLinkInsert}><Link2 size={14} /></button>
+      <button className="toolbar-btn" title="Clear formatting" onClick={() => {
+        editor.update(() => {
+          const sel = $getSelection();
+          if (!$isRangeSelection(sel)) return;
+          (sel as any).formatBold = false;
+          (sel as any).formatItalic = false;
+          (sel as any).formatUnderline = false;
+          (sel as any).formatStrikethrough = false;
+          (sel as any).formatCode = false;
+          (sel as any).formatSubscript = false;
+          (sel as any).formatSuperscript = false;
+          $patchStyleText(sel, {
+            'font-family': '',
+            'font-size': '',
+            'background-color': '',
+            'color': '',
+          });
+        });
+      }}><RemoveFormatting size={14} /></button>
 
       <button className="ai-pill" onClick={onAIClick}><Sparkles size={12} /> Ask AI</button>
     </div>

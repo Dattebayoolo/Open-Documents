@@ -14,6 +14,7 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { ListNode, ListItemNode } from '@lexical/list';
 import { LinkNode } from '@lexical/link';
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { CodeNode, CodeHighlightNode } from '@lexical/code';
 import { $getRoot } from 'lexical';
 import type { EditorState } from 'lexical';
@@ -107,6 +108,7 @@ export default function Editor({ docId, initialState }: EditorProps) {
 
         <AutoFocusPlugin />
         <ListPlugin />
+        <LinkPlugin />
         <CheckListPlugin />
         <TabIndentationPlugin />
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
