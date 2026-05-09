@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from 'react';
 import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import { providerFactory, getRandomColor, getRandomName } from '../../../services/collab';
 import { Users } from 'lucide-react';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 
 interface CollabProps {

@@ -1,4 +1,4 @@
-import { Provider } from '@lexical/yjs';
+import type { Provider } from '@lexical/yjs';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import * as Y from 'yjs';
 
@@ -29,7 +29,6 @@ export function providerFactory(id: string, yjsDocMap: Map<string, Y.Doc>): Prov
     url: WEBSOCKET_ENDPOINT,
     name: id,
     document: doc,
-    connect: false, // Connect manually when component mounts
   });
   
   return provider as unknown as Provider;
